@@ -18,6 +18,7 @@ mongoose.connect(process.env.MONGO_DB_URI , {useNewUrlParser: true , useUnifiedT
 const userRoutes = require("./routes/userRoutes")
 const itemRoutes = require("./routes/itemRoutes")
 const orderRoutes = require("./routes/orderRoutes")
+const { verifyTokenExiry } = require("./utils/Authenticate")
 
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
@@ -46,3 +47,7 @@ app.get("/api" , (req , res)=>{
 app.listen(3000 , ()=>{
     console.log("App lisyemomng on port 3000");
 })
+
+
+app.get("/verify" , verifyTokenExiry)
+    

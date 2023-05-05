@@ -23,7 +23,6 @@ function App() {
   const CartCount = ()=>{
     let count = 0;
     Carts.forEach((item)=>{
-      console.log(item.qty)
       count += item.qty
     })
     return count;
@@ -31,11 +30,34 @@ function App() {
 
 
   useEffect(() => {
+   let  verify = async ()=>{
+      fetch("http://localhost:3000/verify", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          // Send Authorization Token
+          Authorization:localStorage.getItem("token")
+        },
+      }).then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        if (data.Success) {
+          setuser(data.user)
+        } else {
+          localStorage.clear()
+          setuser(null)
+        }
+      }
+      )
+    
+    }
+
       let us = localStorage.getItem('user');
       if(us)
           {
-            setuser(us);
+            verify()
           }
+
       
   }, [])
   return (

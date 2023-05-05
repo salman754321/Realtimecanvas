@@ -1,8 +1,19 @@
-import { Box, Button, Card, CardContent, Divider, Typography } from '@mui/material'
+
+import { Divider, Typography } from '@mui/material'
 import React from 'react'
 import CartItem from '../Components/CartItem'
+import CartTotal from '../Components/CartTotal'
 
-export default function Cart({Carts}) {
+export default function Cart({Carts}) { 
+
+  let Cartt = Carts.map((item , i)=>{
+    console.log(item)
+    return(
+      { items: item.items._id , qty:1 }
+    )
+  })
+
+  console.log(Cartt)
   return (
     <div style={{display:"flex" , flexDirection:"column" , width:"60%" , margin:"100px auto"}}> 
     <Typography variant="h4" style={{textAlign:"center" , color:"#000"}}>Cart</Typography>
@@ -17,27 +28,7 @@ export default function Cart({Carts}) {
        <div style={{marginTop:"50px"}}> </div>
       <Divider variant="middle" style={{color:"#000" , border:"1px solid"}} />
 
-
-      <Card sx={{ display: 'flex' , justifyContent:"space-between" }}>
-      <Box sx={{ display: 'flex', flexDirection: 'column'}}>
-        <CardContent sx={{ flex: '1 0 auto' , justifyContent:"center" , alignContent:"center" , textAlign:"center" }}>
-         
-          <Typography component="div" variant="h5">
-            Total Items : {Carts.reduce((a, c) => a + c.qty, 0)}
-          </Typography>
-        </CardContent>
-      </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-        <CardContent sx={{ flex: '1 0 auto' , justifyContent:"center" , alignContent:"center" , textAlign:"center" }}>
-       
-            <Typography component="div" variant="h5">
-            Total Amount : {Carts.reduce((a, c) => a + c.qty * c.items.price, 0)}
-            </Typography>
-        </CardContent>
-        </Box>
-    </Card>
-
-    <Button variant="contained" style={{marginTop:"50px"}}>Checkout</Button>
+      <CartTotal Carts={Carts}/>
     </div>
   )
 }
