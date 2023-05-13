@@ -1,25 +1,9 @@
 const Item = require('../models/Items');
 const Order = require('../models/Order');
+const { calculateTotal } = require('../utils/utils');
 
 
-let calculateTotal = (items) => {
-    let total = 0;
-    return new Promise((resolve, reject) => {
-        items.forEach((item, index) => {
-            Item.findById(item.item)
-                .then(item => {
-                    total += item.price * items[index].quantity;
-                    if (index == items.length - 1) {
-                        resolve(total);
-                    }
-                })
-                .catch(err => {
-                    reject(err);
-                })
-        })
-    })
-    
-}
+
 
 
 let addOrder = async(req, res) => {

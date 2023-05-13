@@ -3,8 +3,10 @@ import React, { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import PrimarySearchAppBar from "./Screens/AppBar";
 import Cart from "./Screens/Cart";
+import Form from "./Screens/Form";
 import Home from "./Screens/Home";
 import { LoginComponent } from "./Screens/Login";
+import Success from "./Screens/Success";
 
 
 
@@ -68,6 +70,8 @@ function App() {
           <Route path="/login" element={<LoginComponent  setuser={setuser}/>} />
           <Route path="/" element={<Home  user={user} setuser={setuser} AddToCart={AddToCart}/>} />
           <Route path="/cart" element={<Cart  Carts={Carts}/>} />
+          <Route path="/payment" element={<Form Cart={Carts} />} />
+          <Route path="/success" element={<Success />}/>
           <Route path="*" element={<h1>404 Not Found</h1>} />
         </Routes>
       </BrowserRouter>

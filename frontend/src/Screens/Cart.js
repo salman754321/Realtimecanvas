@@ -6,14 +6,6 @@ import CartTotal from '../Components/CartTotal'
 
 export default function Cart({Carts}) { 
 
-  let Cartt = Carts.map((item , i)=>{
-    console.log(item)
-    return(
-      { items: item.items._id , qty:1 }
-    )
-  })
-
-  console.log(Cartt)
   return (
     <div style={{display:"flex" , flexDirection:"column" , width:"60%" , margin:"100px auto"}}> 
     <Typography variant="h4" style={{textAlign:"center" , color:"#000"}}>Cart</Typography>
