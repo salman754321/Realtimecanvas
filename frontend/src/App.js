@@ -1,82 +1,118 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState , useRef} from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import PrimarySearchAppBar from "./Screens/AppBar";
-import Cart from "./Screens/Cart";
-import Form from "./Screens/Form";
-import Home from "./Screens/Home";
-import { LoginComponent } from "./Screens/Login";
-import Success from "./Screens/Success";
+import { Stage, Layer, Text  , Rect} from 'react-konva';
+import io from "socket.io-client";
 
+const socket = io("http://localhost:4000");
 
+// Random id generator
+const generateId = () => {
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+};
 
 function App() {
-  const [user, setuser] = useState(null)
-  const [Carts , setCart] = useState([])
 
-  const AddToCart = (item)=>{
-    console.log(item)
-    let newCart = [...Carts , item]
-    setCart(newCart)
+
+  const [rects, setRects] = React.useState([]);
+ 
+
+  const addNewRect = (x,y,width,height , id) => {
+    const newRect = {
+      x,
+      y,
+      width,
+      height,
+      id: id,
+      color:"red"
+    };
+    setRects(prev => [...prev, newRect]);
+  };
+
+ const  handleDrawClick = () => {
+    const randomX = Math.floor(Math.random() * 300);
+    const randomY = Math.floor(Math.random() * 300);
+    const id = generateId();
+    addNewRect(randomX,randomY,101,110 , id);
+
+    socket.emit("Draw",{x:randomX,y:randomY,width:100,height:100 , id:id});
+
   }
 
 
-
-  const CartCount = ()=>{
-    let count = 0;
-    Carts.forEach((item)=>{
-      count += item.qty
-    })
-    return count;
-  }
-
-
-  useEffect(() => {
-   let  verify = async ()=>{
-      fetch("http://localhost:3000/verify", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          // Send Authorization Token
-          Authorization:localStorage.getItem("token")
-        },
-      }).then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        if (data.Success) {
-          setuser(data.user)
-        } else {
-          localStorage.clear()
-          setuser(null)
-        }
-      }
-      )
+  useEffect(()=>{
     
-    }
+    
+    socket.on("Draw",(data)=>{
 
-      let us = localStorage.getItem('user');
-      if(us)
-          {
-            verify()
-          }
+      addNewRect(data.x,data.y,data.width,data.height , data.id);
+    });
+
+    socket.on("DragEnd",(data)=>{
+
+     setRects(prev=>
+        prev.map((rect)=> rect.id === data.id ? {...rect,x:data.x,y:data.y} : rect
+
+     )
+    );
+
 
       
-  }, [])
-  return (
-    <div className="App">
-      <BrowserRouter>
-      <PrimarySearchAppBar CartCount={CartCount} />
-        <Routes>
-          <Route path="/login" element={<LoginComponent  setuser={setuser}/>} />
-          <Route path="/" element={<Home  user={user} setuser={setuser} AddToCart={AddToCart}/>} />
-          <Route path="/cart" element={<Cart  Carts={Carts}/>} />
-          <Route path="/payment" element={<Form Cart={Carts} />} />
-          <Route path="/success" element={<Success />}/>
-          <Route path="*" element={<h1>404 Not Found</h1>} />
-        </Routes>
-      </BrowserRouter>
-    </div>
-  );
+      // Update the rects state
+      
+    });
+
+  }
+  
+  ,[]);  
+
+
+  const  handleDragEnd = (e) => {
+    const {x,y} = e.target.attrs;
+    
+    console.log(x,y);
+    let id = e.target.id;
+
+    rects.forEach((rect)=>{
+      if(rect.id === e.target.attrs.id){
+        id = rect.id;
+        rect.x = x;
+        rect.y = y;
+        
+
+      }
+    });
+    setRects(rects);
+
+
+    socket.emit("DragEnd",{x:x,y:y,id:id});
+    
+  };
+
+return(
+  <>
+  <button onClick={()=>{handleDrawClick()}}
+  >Draw Rextangle</button>
+    <Stage width={window.innerWidth} height={window.innerHeight}>
+      <Layer>
+      {rects.map((rect)=>(
+        <Rect
+        id={rect.id}
+        key={rect.id}
+        x={rect.x}
+        y={rect.y}
+        width={rect.width}
+        height={rect.height}
+        fill={rect.color}
+        draggable
+       onDragEnd={handleDragEnd}
+        />
+      ))}
+
+      </Layer>
+    </Stage>
+    </> 
+  );  
 }
 
 export default App;
