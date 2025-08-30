@@ -42,7 +42,9 @@ function App() {
 
   useEffect(()=>{
     
-    
+    socket.on("existing_rectangles" , (data)=>{
+      setRects(data)
+    })
     socket.on("Draw",(data)=>{
 
       addNewRect(data.x,data.y,data.width,data.height , data.id);

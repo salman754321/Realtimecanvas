@@ -28,15 +28,26 @@ const io = new Server(serverconf , {
     methods: ["GET" , "POST"]
 });
 
+let rectangles = [];
 io.on("connection" , (socket)=>{
+
+    socket.emit("existing_rectangles" , rectangles)
 
     socket.on("Draw" , (data)=>{
      
+        rectangles.push(data)
         socket.broadcast.emit("Draw" , data)
     
     })
 
     socket.on("DragEnd" , (data)=>{
+
+        rectangles = rectangles.map(rect => {
+            if (rect.id === data.id) {
+              return { ...rect, x: data.x, y: data.y };
+            }
+            return rect;
+          });
         socket.broadcast.emit("DragEnd" , data)
     })
 
